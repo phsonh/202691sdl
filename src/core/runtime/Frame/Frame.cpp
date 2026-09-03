@@ -25,6 +25,9 @@ namespace core::runtime::Frame {
 	std::uint64_t GetFrameCount() {
 		return FrameCount;
 	}
+	void Break() {
+		running = false;
+	}
 	bool IsRunning() {
 		return running;
 	}

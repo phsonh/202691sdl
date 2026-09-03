@@ -7,6 +7,7 @@ namespace core::runtime::Frame {
 	void Begin();
 	void End();
 	bool IsRunning();
+	void Break();
 	void SetTargetFPS(int fps);
 	double GetFPS();
 	std::uint64_t GetFrameCount();

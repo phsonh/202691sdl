@@ -28,22 +28,19 @@ int main(int argc, char* argv[])
     }
     //创建窗口
     core::modules::Window::Engine_Window* window = core::modules::Window::Create(1280, 960);
-    //
-    core::runtime::Frame::Init()
+    //初始化帧
+    core::runtime::Frame::Init();
     while (core::runtime::Frame::IsRunning())
     {
-
         // 处理输入
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
             {
-                running = false;
+                core::runtime::Frame::Break();
             }
         }
-        // 帧计数
-        FrameCount++;
         core::modules::Window::SetTitle(window, std::to_string(FrameCount).c_str());
     }
 
