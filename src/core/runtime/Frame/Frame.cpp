@@ -7,9 +7,9 @@ namespace core::runtime::Frame {
 		std::uint64_t FrameCount;
 		std::uint64_t FrameStartTime;
 		int TargetFPS;
+		double CurrentFPS;
 		bool running;
 	}
-	
 	void Init() {
 		FrameCount = 0;
 		FrameStartTime = 0;
@@ -30,5 +30,11 @@ namespace core::runtime::Frame {
 	}
 	bool IsRunning() {
 		return running;
+	}
+	void SetTargetFPS(int fps) {
+		TargetFPS = fps;
+	}
+	double GetCurrentFPS() {
+		return CurrentFPS;
 	}
 }

@@ -1,8 +1,5 @@
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #include <iostream>
 #include <string>
-#include <lua.hpp>
 #include "core/modules/Window/Window.h"
 #include "core/runtime/SDL/SDL.h"
 #include "core/runtime/Frame/Frame.h"
@@ -10,18 +7,7 @@
 
 int main(int argc, char* argv[])
 {   
-    lua_State* L = luaL_newstate();
-
-    if (!L)
-    {
-        return 1;
-    }
-
-    luaL_openlibs(L);
-    lua_close(L);
-
-
-    // 初始化
+    // 初始化SDL
     if (!core::runtime::SDL::Init())
     {
         return 1;
@@ -46,6 +32,5 @@ int main(int argc, char* argv[])
 
     core::modules::Window::Destroy(window);
     core::runtime::SDL::Shutdown();
-
     return 0;
 }
