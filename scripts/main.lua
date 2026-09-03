@@ -1,5 +1,5 @@
 local result =
-    module.Window.SetTitle(
+    modules.Window.SetTitle(
         "Hello from Lua!"
     )
 

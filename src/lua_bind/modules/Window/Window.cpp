@@ -34,7 +34,7 @@ namespace lua_bind::modules::Window {
         lua_getglobal(L, "modules");
         if (lua_isnil(L, -1)) {
             lua_pop(L, 1);
-            lua_newtable(L, 1);
+            lua_newtable(L);
             lua_pushvalue(L, -1);
             lua_setglobal(L, "modules");
         }
