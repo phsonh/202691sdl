@@ -1,4 +1,6 @@
 #include <iostream>
+#include <format>
+#include <SDL3/SDL.h>
 #include <string>
 #include "core/modules/Window/Window.h"
 #include "core/runtime/SDL/SDL.h"
@@ -30,11 +32,10 @@ int main(int argc, char* argv[])
                 core::runtime::Frame::Break();
             }
         }
-        core::modules::Window::SetTitle(window, std::to_string(FrameCount).c_str());
-
+        std::string title = std::format("Frame: {} | FPS: {:.1f}",core::runtime::Frame::GetFrameCount(),core::runtime::Frame::GetCurrentFPS());
+        core::modules::Window::SetTitle(window,title.c_str());
         core::runtime::Frame::End();
     }
-
     core::modules::Window::Destroy(window);
     core::runtime::SDL::Shutdown();
     return 0;

@@ -8,7 +8,9 @@ namespace core::runtime::Frame {
 		std::uint64_t FrameCount;
 		std::uint64_t ThisFrameStartTime;
 		std::uint64_t LastFrameStartTime;
-		std::uint64_t LastFrameUsedTime;
+		std::uint64_t LastFrameTotalUsedTime;
+		std::uint64_t ThisFrameAlreadyUsedTime;
+		std::int64_t ThisFrameTimeLeft;
 		std::uint64_t FrameBudgetTime;
 		int TargetFPS;
 		double CurrentFPS;
@@ -16,22 +18,26 @@ namespace core::runtime::Frame {
 	}
 	void Init() {
 		FrameCount = 0;
-		ThisFrameStartTime = 0;
-		LastFrameUsedTime = 0;
+		LastFrameTotalUsedTime = 0;
 		TargetFPS = 60;
 		running = true;
 		FrameBudgetTime = NS_PER_SECOND / TargetFPS;
+		ThisFrameStartTime = SDL_GetTicksNS();
+		SDL_DelayPrecise(FrameBudgetTime);
 	}
 	void Begin() {
 		LastFrameStartTime = ThisFrameStartTime;
 		ThisFrameStartTime = SDL_GetTicksNS();
-		LastFrameUsedTime = ThisFrameStartTime - LastFrameStartTime;
+		LastFrameTotalUsedTime = ThisFrameStartTime - LastFrameStartTime;
 		FrameCount++;
+		//计算上一帧的FPS
+		CurrentFPS = static_cast<double>(NS_PER_SECOND) / static_cast<double>(LastFrameTotalUsedTime);
 	}
 	void End() {
-
-		if ((SDL_GetTicksNS() - ThisFrameStartTime) < FrameBudgetTime) {
-			SDL_DelayPrecise(FrameBudgetTime - (SDL_GetTicksNS() - ThisFrameStartTime));
+		ThisFrameAlreadyUsedTime = SDL_GetTicksNS() - ThisFrameStartTime;
+		ThisFrameTimeLeft = static_cast<std::int64_t>(FrameBudgetTime) - static_cast<std::int64_t>(ThisFrameAlreadyUsedTime);
+		if (ThisFrameTimeLeft > 0) {
+			SDL_DelayPrecise(ThisFrameTimeLeft);
 		}
 	}
 	std::uint64_t GetFrameCount() {
@@ -45,6 +51,7 @@ namespace core::runtime::Frame {
 	}
 	void SetTargetFPS(int fps) {
 		TargetFPS = fps;
+		FrameBudgetTime = NS_PER_SECOND / TargetFPS;
 	}
 	double GetCurrentFPS() {
 		return CurrentFPS;

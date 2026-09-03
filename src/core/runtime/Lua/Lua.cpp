@@ -3,7 +3,7 @@
 namespace core::runtime::Lua {
 	bool Init() {
         lua_State* L = luaL_newstate();
-        return L
+        return L;
 
         /*
         luaL_openlibs(L);
