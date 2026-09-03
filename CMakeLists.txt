@@ -117,3 +117,23 @@ add_custom_command(
 
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
+
+add_custom_target(
+    copy_scripts
+    ALL
+
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy_directory
+        "${CMAKE_SOURCE_DIR}/scripts"
+        "${CMAKE_CURRENT_BINARY_DIR}/scripts"
+
+    COMMENT
+        "Copying Lua scripts"
+)
+
+add_dependencies(
+    ${PROJECT_NAME}
+    copy_scripts
+)

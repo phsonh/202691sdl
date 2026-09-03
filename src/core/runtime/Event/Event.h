@@ -9,5 +9,7 @@ namespace core::runtime::Event {
         bool FocusLost = false;
     };
     extern Engine_Events Events;
+    bool Init();
     void Update();
+    void Shutdown();
 }

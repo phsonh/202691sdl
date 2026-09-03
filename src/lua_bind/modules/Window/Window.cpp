@@ -14,34 +14,39 @@ namespace lua_bind::modules::Window {
                 );
             }
             //检测是否是字符串
-            luaL_checktype(
-                L,
-                1,
-                LUA_TSTRING
-            );
+            if (lua_type(L, 1) != LUA_TSTRING)
+            {
+                return luaL_error(
+                    L,
+                    "modules.Window.SetTitle: argument #1 must be a string"
+                );
+            }
             const char* title = lua_tostring(L, 1);
-            bool success = core::modules::Window::SetTitle(title);
-            if (!success) {
-
+            if (!core::modules::Window::SetTitle(title))
+            {
+                return luaL_error(
+                    L,
+                    "modules.Window.SetTitle failed"
+                );
             }
             
             return 0;
         }
+
+        const luaL_Reg modules_Window_Functions[] =
+        {
+            { "SetTitle", SetTitle },
+            // 结束标志
+            { nullptr, nullptr }
+        };
     } 
 
     void Register(lua_State* L) {
-        // 全局变量modules
-        lua_getglobal(L, "modules");
-        if (lua_isnil(L, -1)) {
-            lua_pop(L, 1);
-            lua_newtable(L);
-            lua_pushvalue(L, -1);
-            lua_setglobal(L, "modules");
-        }
-        lua_newtable(L);
-        lua_pushcfunction(L, SetTitle);
-        lua_setfield(L, -2, "SetTitle");
-        lua_setfield(L, -2, "Window");
+        luaL_register(
+            L,
+            "modules.Window",
+            modules_Window_Functions
+        );
         lua_pop(L, 1);
     }
 }

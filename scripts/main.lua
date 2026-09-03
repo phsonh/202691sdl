@@ -1,6 +1,6 @@
 local result =
     modules.Window.SetTitle(
-        "Hello from Lua!"
+        1234
     )
 
 print(result)

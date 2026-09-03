@@ -1,12 +1,16 @@
 #include "Lua.h"
 #include <string>
-
+#include <iostream>
+#include "core/modules/Debug/Debug.h"
 
 namespace core::runtime::Lua {
     namespace {
         lua_State* L = nullptr;
     }
     bool Init() {
+        if (L) {
+            return true;
+        }
         L = luaL_newstate();
         if (!L) {
             // std::cerr << "Lua state create failed\n";
@@ -26,6 +30,10 @@ namespace core::runtime::Lua {
         int result = luaL_dofile(L, path.c_str());
         if (result!=0) {
             const char* error = lua_tostring(L, -1);
+            core::modules::Debug::ErrorBox(
+                "Lua Error",
+                error ? error : "Unknown Lua error"
+            );
             lua_pop(L, 1);
             return false;
         }

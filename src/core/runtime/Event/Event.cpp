@@ -3,8 +3,17 @@
 
 
 namespace core::runtime::Event {
+    namespace {
+        bool Initialized = false;
+    }
     Engine_Events Events;
-
+    bool Init() {
+        if (Initialized) {
+            return true;
+        }
+        Initialized = true;
+        return true;
+    }
     void Update() {
         Events = {};
         SDL_Event event;
@@ -22,6 +31,12 @@ namespace core::runtime::Event {
                     break;
             }
         }
-        
+    }
+    void Shutdown()
+    {
+        if (!Initialized) {
+            return;
+        }
+        Initialized = false;
     }
 }

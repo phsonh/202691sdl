@@ -4,6 +4,7 @@
 
 namespace core::runtime::Frame {
 	namespace {
+		bool Initialized = false;
 		constexpr std::uint64_t NS_PER_SECOND = 1'000'000'000;
 		std::uint64_t FrameCount;
 		std::uint64_t ThisFrameStartTime;
@@ -14,16 +15,19 @@ namespace core::runtime::Frame {
 		std::uint64_t FrameBudgetTime;
 		int TargetFPS;
 		double CurrentFPS;
-		bool running;
 	}
-	void Init() {
+	bool Init() {
+		if (Initialized) {
+			return true;
+		}
 		FrameCount = 0;
 		LastFrameTotalUsedTime = 0;
 		TargetFPS = 60;
-		running = true;
 		FrameBudgetTime = NS_PER_SECOND / TargetFPS;
 		ThisFrameStartTime = SDL_GetTicksNS();
 		SDL_DelayPrecise(FrameBudgetTime);
+		Initialized = true;
+		return true;
 	}
 	void Begin() {
 		LastFrameStartTime = ThisFrameStartTime;
@@ -40,14 +44,15 @@ namespace core::runtime::Frame {
 			SDL_DelayPrecise(ThisFrameTimeLeft);
 		}
 	}
+	void Shutdown()
+	{
+		if (!Initialized) {
+			return;
+		}
+		Initialized = false;
+	}
 	std::uint64_t GetFrameCount() {
 		return FrameCount;
-	}
-	void Break() {
-		running = false;
-	}
-	bool IsRunning() {
-		return running;
 	}
 	void SetTargetFPS(int fps) {
 		TargetFPS = fps;
