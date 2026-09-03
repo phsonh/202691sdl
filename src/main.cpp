@@ -1,6 +1,5 @@
 #include <iostream>
 #include <format>
-#include <SDL3/SDL.h>
 #include <string>
 #include "core/modules/Window/Window.h"
 #include "core/runtime/SDL/SDL.h"

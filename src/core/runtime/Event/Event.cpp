@@ -14,9 +14,6 @@ namespace core::runtime::Event {
                 case SDL_EVENT_QUIT:
                     Events.QuitRequested = true;
                     break;
-                case SDL_EVENT_WINDOW_RESIZED:
-                    Events.WindowResized = true;
-                    break;
                 case SDL_EVENT_WINDOW_FOCUS_GAINED:
                     Events.focusGained = true;
                     break;
