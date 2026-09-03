@@ -5,6 +5,7 @@
 #include "core/modules/Window/Window.h"
 #include "core/runtime/SDL/SDL.h"
 #include "core/runtime/Frame/Frame.h"
+#include "core/runtime/Event/Event.h"
 
 
 int main(int argc, char* argv[])
@@ -24,14 +25,11 @@ int main(int argc, char* argv[])
         core::runtime::Frame::Begin();
 
         // 处理输入
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                core::runtime::Frame::Break();
-            }
+        core::runtime::Event::Update();
+        if (core::runtime::Event::Events.QuitRequested) {
+            core::runtime::Frame::Break();
         }
+        
         std::string title = std::format("Frame: {} | FPS: {:.1f}",core::runtime::Frame::GetFrameCount(),core::runtime::Frame::GetCurrentFPS());
         core::modules::Window::SetTitle(window,title.c_str());
         core::runtime::Frame::End();
