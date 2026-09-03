@@ -1,6 +1,12 @@
-local result =
-    modules.Window.SetTitle(
-        1234
-    )
+local timer = 0
 
-print(result)
+modules.Frame.SetFrameFunc(
+    function()
+        modules.Window.SetTitle("Frame running")
+        print(timer)
+        if timer == 120 then
+            error("Frame test error")
+        end
+        timer = timer + 1
+    end
+)

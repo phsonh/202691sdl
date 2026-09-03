@@ -6,6 +6,8 @@
 #include "core/runtime/Lua/Lua.h"
 #include "core/runtime/SDL/SDL.h"
 #include "lua_bind/modules/Window/Window.h"
+#include "lua_bind/modules/Frame/Frame.h"
+
 
 namespace engine {
     namespace {
@@ -26,6 +28,21 @@ namespace engine {
                 core::modules::Debug::Init() &&
                 // 2
                 core::modules::Window::Init(1280, 960);
+        }
+        bool LuaBind_Init()
+        {
+            lua_State* L =
+                core::runtime::Lua::GetState();
+
+            if (!L)
+                return false;
+
+            lua_bind::modules::Window::Register(L);
+            lua_bind::modules::Frame::Register(L);
+
+            return core::runtime::Lua::DoFile(
+                "scripts/main.lua"
+            );
         }
         bool IsRunning = false;
         void Modules_Shutdown() {
@@ -50,7 +67,8 @@ namespace engine {
     {
         IsRunning =
             Runtime_Init() &&
-            Modules_Init();
+            Modules_Init() &&
+            LuaBind_Init();
         return IsRunning;
     }
     bool Run() {
@@ -61,6 +79,11 @@ namespace engine {
             core::runtime::Event::Update();
             if (core::runtime::Event::Events.QuitRequested) {
                 IsRunning = false;
+            }
+            if (!core::runtime::Lua::CallFrameFunc())
+            {
+                IsRunning = false;
+                return false;
             }
             core::runtime::Frame::End();
         }
