@@ -1,6 +1,7 @@
 #pragma once
 
+struct lua_State;
 
 namespace lua_bind::modules::Window {
-	int SetTitle(lua_State* L);
+	void Register(lua_State* L);
 }

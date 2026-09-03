@@ -15,10 +15,10 @@ namespace core::runtime::Event {
                     Events.QuitRequested = true;
                     break;
                 case SDL_EVENT_WINDOW_FOCUS_GAINED:
-                    Events.focusGained = true;
+                    Events.FocusGained = true;
                     break;
                 case SDL_EVENT_WINDOW_FOCUS_LOST:
-                    Events.focusLost = true;
+                    Events.FocusLost = true;
                     break;
             }
         }
