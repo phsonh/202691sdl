@@ -29,9 +29,12 @@ namespace core::runtime::Lua {
             lua_pop(L, 1);
             return false;
         }
+        return true;
     }
 
     void Shutdown() {
+        if (!L)
+            return;
         lua_close(L);
         L = nullptr;
     }
