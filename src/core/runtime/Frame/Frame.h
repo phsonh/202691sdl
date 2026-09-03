@@ -1,0 +1,13 @@
+#pragma once
+#include <cstdint>
+
+
+namespace core::runtime::Frame {
+	void Init();
+	void Begin();
+	void End();
+	bool IsRunning();
+	void SetTargetFPS(int fps);
+	double GetFPS();
+	std::uint64_t GetFrameCount();
+}
