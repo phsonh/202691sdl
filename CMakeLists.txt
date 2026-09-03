@@ -3,10 +3,25 @@ cmake_minimum_required(VERSION 3.16)
 project(202691sdl LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 加入 SDL3
-add_subdirectory(3rd_party/SDL EXCLUDE_FROM_ALL)
-set(LUAJIT_DIR
+
+# ==============================
+# SDL3
+# ==============================
+
+add_subdirectory(
+    3rd_party/SDL
+    EXCLUDE_FROM_ALL
+)
+
+
+# ==============================
+# LuaJIT
+# ==============================
+
+set(
+    LUAJIT_DIR
     "${CMAKE_SOURCE_DIR}/3rd_party/LuaJIT"
 )
 
@@ -31,30 +46,74 @@ set_target_properties(
 )
 
 
-# 创建程序
-add_executable(202691sdl
-    src/main.cpp
- "src/core/modules/Window/Window.h" "src/core/modules/Window/Window.cpp" "src/core/runtime/SDL_Runtime.h" "src/core/runtime/SDL_Runtime/SDL_Runtime.cpp" "src/core/runtime/Frame_Runtime/Frame_Runtime.h")
-#[[
+# ==============================
+# 自动收集 src 下所有 cpp
+# ==============================
 
-add_executable(202691sdl WIN32
-    src/main.cpp
+file(
+    GLOB_RECURSE
+    PROJECT_SOURCES
+
+    CONFIGURE_DEPENDS
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-]]
 
-# 让程序链接 SDL3
-target_link_libraries(202691sdl
+# ==============================
+# 主程序
+# ==============================
+
+add_executable(
+    ${PROJECT_NAME}
+
+    ${PROJECT_SOURCES}
+)
+
+
+# src 作为 include 根目录
+#
+# 因此可以：
+# #include "core/runtime/Frame/Frame.h"
+
+target_include_directories(
+    ${PROJECT_NAME}
+
     PRIVATE
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+
+
+# ==============================
+# 链接
+# ==============================
+
+target_link_libraries(
+    ${PROJECT_NAME}
+
+    PRIVATE
+
     SDL3::SDL3
     LuaJIT::LuaJIT
 )
 
+
+# ==============================
+# 复制 LuaJIT DLL
+# ==============================
+
 add_custom_command(
-    TARGET 202691sdl
+    TARGET ${PROJECT_NAME}
+
     POST_BUILD
 
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        copy_if_different
+
         "${LUAJIT_DIR}/src/lua51.dll"
-        "$<TARGET_FILE_DIR:202691sdl>"
+
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
 )
