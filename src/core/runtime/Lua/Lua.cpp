@@ -1,13 +1,38 @@
 #include "Lua.h"
+#include <string>
+
 
 namespace core::runtime::Lua {
-	bool Init() {
-        lua_State* L = luaL_newstate();
-        return L;
-
-        /*
+    namespace {
+        lua_State* L = nullptr;
+    }
+    bool Init() {
+        L = luaL_newstate();
+        if (!L) {
+            // std::cerr << "Lua state create failed\n";
+            return false;
+        }
+            
         luaL_openlibs(L);
-        lua_close(L);
-        */
+        return true;
 	}
+    lua_State* GetState() {
+        return L;
+    }
+
+    bool DoFile(const std::string& path) {
+        if (!L)
+            return false;
+        int result = luaL_dofile(L, path.c_str());
+        if (result!=0) {
+            const char* error = lua_tostring(L, -1);
+            lua_pop(L, 1);
+            return false;
+        }
+    }
+
+    void Shutdown() {
+        lua_close(L);
+        L = nullptr;
+    }
 }
