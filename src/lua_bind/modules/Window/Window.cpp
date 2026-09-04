@@ -33,7 +33,7 @@ namespace lua_bind::modules::Window {
             return 0;
         }
 
-        const luaL_Reg modules_Window_Functions[] =
+        const luaL_Reg Functions[] =
         {
             { "SetTitle", SetTitle },
             // 结束标志
@@ -45,7 +45,7 @@ namespace lua_bind::modules::Window {
         luaL_register(
             L,
             "modules.Window",
-            modules_Window_Functions
+            Functions
         );
         lua_pop(L, 1);
     }

@@ -3,11 +3,12 @@
 #include "core/modules/Debug/Debug.h"
 #include "core/runtime/Event/Event.h"
 #include "core/runtime/Frame/Frame.h"
+#include "core/modules/Math/Math.h"
 #include "core/runtime/Lua/Lua.h"
 #include "core/runtime/SDL/SDL.h"
 #include "lua_bind/modules/Window/Window.h"
 #include "lua_bind/modules/Frame/Frame.h"
-
+#include "lua_bind/modules/Math/Math.h"
 
 namespace engine {
     namespace {
@@ -27,7 +28,9 @@ namespace engine {
                 // 1
                 core::modules::Debug::Init() &&
                 // 2
-                core::modules::Window::Init(1280, 960);
+                core::modules::Window::Init(1280, 960) &&
+                // 3
+                core::modules::Math::Init();
         }
         bool LuaBind_Init()
         {
@@ -39,6 +42,7 @@ namespace engine {
 
             lua_bind::modules::Window::Register(L);
             lua_bind::modules::Frame::Register(L);
+            lua_bind::modules::Math::Register(L);
 
             return core::runtime::Lua::DoFile(
                 "scripts/main.lua"
@@ -46,6 +50,8 @@ namespace engine {
         }
         bool IsRunning = false;
         void Modules_Shutdown() {
+            // 3
+            core::modules::Math::Shutdown();
             // 2
             core::modules::Window::Shutdown();
             // 1

@@ -114,6 +114,16 @@ namespace core::runtime::Lua {
     void Shutdown() {
         if (!L)
             return;
+        if (FrameFuncRef != LUA_NOREF)
+        {
+            luaL_unref(
+                L,
+                LUA_REGISTRYINDEX,
+                FrameFuncRef
+            );
+
+            FrameFuncRef = LUA_NOREF;
+        }
         lua_close(L);
         L = nullptr;
     }

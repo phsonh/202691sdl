@@ -123,16 +123,17 @@ add_custom_target(
     ALL
 
     COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_directory
+        ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/scripts"
         "${CMAKE_CURRENT_BINARY_DIR}/scripts"
+
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/doc"
         "${CMAKE_CURRENT_BINARY_DIR}/doc"
 
     COMMENT
-        "Copying Lua scripts"
+        "Copying Lua scripts and docs"
 )
 
 add_dependencies(
