@@ -1,32 +1,53 @@
 #include "SDL.h"
 #include <SDL3/SDL.h>
-#include <iostream>
+#include <string>
+#include "core/runtime/Log/Log.h"
 
 namespace core::runtime::SDL {
     namespace {
         bool Initialized = false;
     }
-	bool Init() {
-        // 初始化
-        if (Initialized) {
+    bool Init()
+    {
+        if (Initialized)
             return true;
-        }
-        bool sdl_init_success = SDL_Init(SDL_INIT_VIDEO);
-        if (!sdl_init_success)
+
+        bool success =
+            SDL_Init(SDL_INIT_VIDEO);
+
+        if (!success)
         {
-            std::cerr << "SDL_Init failed: "
-                << SDL_GetError() << '\n';
+            core::runtime::Log::Error(
+                std::string(
+                    "SDL_Init failed: "
+                ) +
+                SDL_GetError()
+            );
+
             return false;
         }
-        Initialized = true;
-        return true;
-	}
 
-    void Shutdown() {
-        if (!Initialized) {
+        Initialized = true;
+
+        core::runtime::Log::Debug(
+            "SDL runtime initialized"
+        );
+
+        return true;
+    }
+
+
+    void Shutdown()
+    {
+        if (!Initialized)
             return;
-        }
+
         SDL_Quit();
+
         Initialized = false;
+
+        core::runtime::Log::Debug(
+            "SDL runtime shutdown"
+        );
     }
 }

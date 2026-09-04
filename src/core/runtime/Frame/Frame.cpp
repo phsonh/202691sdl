@@ -1,6 +1,8 @@
 #include "Frame.h"
 #include <cstdint>
 #include <SDL3/SDL.h>
+#include <format>
+#include "core/runtime/Log/Log.h"
 
 namespace core::runtime::Frame {
 	namespace {
@@ -16,17 +18,25 @@ namespace core::runtime::Frame {
 		int TargetFPS;
 		double CurrentFPS;
 	}
-	bool Init() {
-		if (Initialized) {
+	bool Init()
+	{
+		if (Initialized)
 			return true;
-		}
+
 		FrameCount = 0;
 		LastFrameTotalUsedTime = 0;
 		TargetFPS = 60;
 		FrameBudgetTime = NS_PER_SECOND / TargetFPS;
 		ThisFrameStartTime = SDL_GetTicksNS();
-		SDL_DelayPrecise(FrameBudgetTime);
+		SDL_DelayPrecise( FrameBudgetTime );
 		Initialized = true;
+		core::runtime::Log::Debug(
+			std::format(
+				"Frame runtime initialized: target FPS = {}",
+				TargetFPS
+			)
+		);
+
 		return true;
 	}
 	void Begin() {
@@ -46,17 +56,27 @@ namespace core::runtime::Frame {
 	}
 	void Shutdown()
 	{
-		if (!Initialized) {
+		if (!Initialized)
 			return;
-		}
+
+		core::runtime::Log::Debug(
+			std::format(
+				"Frame runtime shutdown: total frames = {}",
+				FrameCount
+			)
+		);
+
 		Initialized = false;
 	}
 	std::uint64_t GetFrameCount() {
 		return FrameCount;
 	}
 	void SetTargetFPS(int fps) {
-		TargetFPS = fps;
-		FrameBudgetTime = NS_PER_SECOND / TargetFPS;
+		if (fps > 0) {
+			TargetFPS = fps;
+			FrameBudgetTime = NS_PER_SECOND / TargetFPS;
+		}
+			
 	}
 	double GetCurrentFPS() {
 		return CurrentFPS;

@@ -1,7 +1,15 @@
 #include "Log.h"
 
+#include <chrono>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
+#include <string>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 namespace core::runtime::Log
 {
@@ -11,33 +19,145 @@ namespace core::runtime::Log
 
         std::ofstream LogFile;
 
+        constexpr const char* COLOR_RESET =
+            "\x1b[0m";
+
+        constexpr const char* COLOR_YELLOW =
+            "\x1b[33m";
+
+        constexpr const char* COLOR_RED =
+            "\x1b[31m";
+
+
+#ifdef _WIN32
+        void EnableVirtualTerminal(
+            DWORD outputHandle
+        )
+        {
+            HANDLE handle =
+                GetStdHandle(outputHandle);
+
+            if (
+                handle == INVALID_HANDLE_VALUE ||
+                handle == nullptr
+                )
+            {
+                return;
+            }
+
+            DWORD mode = 0;
+
+            if (!GetConsoleMode(handle, &mode))
+                return;
+
+            SetConsoleMode(
+                handle,
+                mode |
+                ENABLE_VIRTUAL_TERMINAL_PROCESSING
+            );
+        }
+
+
+        void EnableConsoleColor()
+        {
+            EnableVirtualTerminal(
+                STD_OUTPUT_HANDLE
+            );
+
+            EnableVirtualTerminal(
+                STD_ERROR_HANDLE
+            );
+        }
+#endif
+
+
+        std::string GetTimestamp()
+        {
+            using namespace std::chrono;
+
+            auto now =
+                system_clock::now();
+
+            auto time =
+                system_clock::to_time_t(now);
+
+            std::tm localTime{};
+
+#ifdef _WIN32
+            localtime_s(
+                &localTime,
+                &time
+            );
+#else
+            localtime_r(
+                &time,
+                &localTime
+            );
+#endif
+
+            auto milliseconds =
+                duration_cast<
+                std::chrono::milliseconds
+                >(
+                    now.time_since_epoch()
+                ) % 1000;
+
+            std::ostringstream stream;
+
+            stream
+                << std::put_time(
+                    &localTime,
+                    "%Y-%m-%d %H:%M:%S"
+                )
+                << '.'
+                << std::setfill('0')
+                << std::setw(3)
+                << milliseconds.count();
+
+            return stream.str();
+        }
+
 
         void Write(
             const char* level,
             std::string_view message,
-            std::ostream& console
+            std::ostream& console,
+            const char* color = nullptr
         )
         {
+            const std::string timestamp =
+                GetTimestamp();
+
             // 控制台
+            if (color)
+                console << color;
+
             console
                 << '['
+                << timestamp
+                << "] ["
                 << level
                 << "] "
-                << message
-                << '\n';
+                << message;
 
-            // engine.log
+            if (color)
+                console << COLOR_RESET;
+
+            console << '\n';
+
+
+            // engine.log 不写颜色控制字符
             if (LogFile.is_open())
             {
                 LogFile
                     << '['
+                    << timestamp
+                    << "] ["
                     << level
                     << "] "
                     << message
                     << '\n';
 
-                // 第一版直接每条都刷新。
-                // 以后日志特别多时再考虑缓冲。
                 LogFile.flush();
             }
         }
@@ -49,22 +169,34 @@ namespace core::runtime::Log
         if (Initialized)
             return true;
 
+#ifdef _WIN32
+        EnableConsoleColor();
+#endif
+
         LogFile.open(
             "engine.log",
-            std::ios::out | std::ios::trunc
+            std::ios::out |
+            std::ios::trunc
         );
-
-        if (!LogFile.is_open())
-        {
-            std::cerr
-                << "[FATAL] Failed to open engine.log\n";
-
-            return false;
-        }
 
         Initialized = true;
 
-        Info("Log initialized");
+        if (!LogFile.is_open())
+        {
+            Warn(
+                "Failed to open engine.log; file logging disabled for this run"
+            );
+        }
+        else
+        {
+            Info(
+                "File logging enabled: engine.log"
+            );
+        }
+
+        Info(
+            "Log runtime initialized"
+        );
 
         return true;
     }
@@ -75,16 +207,23 @@ namespace core::runtime::Log
         if (!Initialized)
             return;
 
-        Info("Log shutdown");
+        Info(
+            "Log runtime shutdown"
+        );
 
-        LogFile.flush();
-        LogFile.close();
+        if (LogFile.is_open())
+        {
+            LogFile.flush();
+            LogFile.close();
+        }
 
         Initialized = false;
     }
 
 
-    void Debug(std::string_view message)
+    void Debug(
+        std::string_view message
+    )
     {
         Write(
             "DEBUG",
@@ -94,7 +233,9 @@ namespace core::runtime::Log
     }
 
 
-    void Info(std::string_view message)
+    void Info(
+        std::string_view message
+    )
     {
         Write(
             "INFO ",
@@ -104,32 +245,41 @@ namespace core::runtime::Log
     }
 
 
-    void Warn(std::string_view message)
+    void Warn(
+        std::string_view message
+    )
     {
         Write(
             "WARN ",
             message,
-            std::cerr
+            std::cerr,
+            COLOR_YELLOW
         );
     }
 
 
-    void Error(std::string_view message)
+    void Error(
+        std::string_view message
+    )
     {
         Write(
             "ERROR",
             message,
-            std::cerr
+            std::cerr,
+            COLOR_RED
         );
     }
 
 
-    void Fatal(std::string_view message)
+    void Fatal(
+        std::string_view message
+    )
     {
         Write(
             "FATAL",
             message,
-            std::cerr
+            std::cerr,
+            COLOR_RED
         );
     }
 }

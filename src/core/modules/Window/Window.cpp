@@ -1,7 +1,8 @@
 #include "Window.h"
-#include <iostream>
+#include <string>
 #include <SDL3/SDL.h>
-
+#include "core/runtime/Log/Log.h"
+#include <format>
 
 namespace core::modules::Window {
     namespace {
@@ -12,9 +13,20 @@ namespace core::modules::Window {
             return true;
         window = SDL_CreateWindow("",width,height,0);
         if (!window) {
-            std::cerr << "CreateWindow failed: " << SDL_GetError() << '\n';
+            core::runtime::Log::Error(
+                std::string("CreateWindow failed: ") +
+                SDL_GetError()
+            );
             return false;
         }
+        core::runtime::Log::Debug(
+            std::format(
+                "Window module initialized: {}x{}",
+                width,
+                height
+            )
+        );
+
         return true;
     }
     bool SetTitle(const char* title) {
@@ -29,6 +41,9 @@ namespace core::modules::Window {
         }
         SDL_DestroyWindow(window);
         window = nullptr;
+        core::runtime::Log::Debug(
+            "Window module shutdown: window destroyed"
+        );
     }
 }
 

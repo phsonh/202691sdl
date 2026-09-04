@@ -1,17 +1,23 @@
 #include "Event.h"
 #include <SDL3/SDL.h>
-
+#include "core/runtime/Log/Log.h"
 
 namespace core::runtime::Event {
     namespace {
         bool Initialized = false;
     }
     Engine_Events Events;
-    bool Init() {
-        if (Initialized) {
+    bool Init()
+    {
+        if (Initialized)
             return true;
-        }
+
         Initialized = true;
+
+        core::runtime::Log::Debug(
+            "Event runtime initialized"
+        );
+
         return true;
     }
     void Update() {
@@ -34,9 +40,13 @@ namespace core::runtime::Event {
     }
     void Shutdown()
     {
-        if (!Initialized) {
+        if (!Initialized)
             return;
-        }
+
         Initialized = false;
+
+        core::runtime::Log::Debug(
+            "Event runtime shutdown"
+        );
     }
 }

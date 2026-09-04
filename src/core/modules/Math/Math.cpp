@@ -1,6 +1,7 @@
 #include "Math.h"
 #include <cmath>
 #include <numbers>
+#include "core/runtime/Log/Log.h"
 
 namespace core::modules::Math {
 	namespace {
@@ -8,11 +9,17 @@ namespace core::modules::Math {
         const double DEG2RAD_FACTOR = std::numbers::pi / 180.0;
         const double RAD2DEG_FACTOR = 180.0 / std::numbers::pi;
 	}
-    bool Init() {
-        if (Initialized) {
+    bool Init()
+    {
+        if (Initialized)
             return true;
-        }
+
         Initialized = true;
+
+        core::runtime::Log::Debug(
+            "Math module initialized"
+        );
+
         return true;
     }
     double sin(double deg) {
@@ -33,10 +40,15 @@ namespace core::modules::Math {
     double rad2deg(double rad) {
         return rad * RAD2DEG_FACTOR;
     }
-    void Shutdown() {
-        if (!Initialized) {
+    void Shutdown()
+    {
+        if (!Initialized)
             return;
-        }
+
         Initialized = false;
+
+        core::runtime::Log::Debug(
+            "Math module shutdown"
+        );
     }
 }

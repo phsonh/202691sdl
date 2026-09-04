@@ -10,7 +10,7 @@ end
 print(string.format("The angle from boss to player is %.1f",Angle(boss,player)))
 modules.Debug.Log("hello")
 modules.Debug.Warn("careful")
-modules.Debug.Error("fatal test")
+--modules.Debug.Error("fatal test")
 
 print("这里不会执行")
 
