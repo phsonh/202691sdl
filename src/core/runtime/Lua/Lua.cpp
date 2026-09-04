@@ -1,45 +1,98 @@
 #include "Lua.h"
-#include <string>
-#include <iostream>
-#include "core/modules/Debug/Debug.h"
 
-namespace core::runtime::Lua {
-    namespace {
+#include <string>
+
+#include "core/runtime/Log/Log.h"
+
+namespace core::runtime::Lua
+{
+    namespace
+    {
         lua_State* L = nullptr;
+
         int FrameFuncRef = LUA_NOREF;
-    }
-    bool Init() {
-        if (L) {
-            return true;
+
+
+        void ReadAndPopError(
+            std::string& error
+        )
+        {
+            const char* message =
+                lua_tostring(L, -1);
+
+            error =
+                message
+                ? message
+                : "Unknown Lua error";
+
+            lua_pop(L, 1);
         }
+    }
+
+
+    bool Init()
+    {
+        if (L)
+            return true;
+
         L = luaL_newstate();
-        if (!L) {
-            // std::cerr << "Lua state create failed\n";
+
+        if (!L)
+        {
+            core::runtime::Log::Error(
+                "Failed to create Lua state"
+            );
+
             return false;
         }
-            
+
         luaL_openlibs(L);
+
+        core::runtime::Log::Debug(
+            "Lua runtime initialized"
+        );
+
         return true;
-	}
-    lua_State* GetState() {
+    }
+
+
+    lua_State* GetState()
+    {
         return L;
     }
 
-    bool DoFile(const std::string& path) {
+
+    bool DoFile(
+        const std::string& path,
+        std::string& error
+    )
+    {
+        error.clear();
+
         if (!L)
-            return false;
-        int result = luaL_dofile(L, path.c_str());
-        if (result!=0) {
-            const char* error = lua_tostring(L, -1);
-            core::modules::Debug::ErrorBox(
-                "Lua Error",
-                error ? error : "Unknown Lua error"
-            );
-            lua_pop(L, 1);
+        {
+            error =
+                "Lua runtime is not initialized";
+
             return false;
         }
+
+        int result =
+            luaL_dofile(
+                L,
+                path.c_str()
+            );
+
+        if (result != 0)
+        {
+            ReadAndPopError(error);
+
+            return false;
+        }
+
         return true;
     }
+
 
     bool SetFrameFunc(int index)
     {
@@ -58,7 +111,10 @@ namespace core::runtime::Lua {
             );
         }
 
-        lua_pushvalue(L, index);
+        lua_pushvalue(
+            L,
+            index
+        );
 
         FrameFuncRef =
             luaL_ref(
@@ -69,41 +125,55 @@ namespace core::runtime::Lua {
         return true;
     }
 
-    bool CallFrameFunc()
-    {
-        if (!L)
-            return false;
 
-        // 没有设置 FrameFunc，就当这一帧 Lua 什么都不做
+    bool CallFrameFunc(
+        std::string& error
+    )
+    {
+        error.clear();
+
+        if (!L)
+        {
+            error =
+                "Lua runtime is not initialized";
+
+            return false;
+        }
+
+        // Lua 没有设置 FrameFunc：
+        // 这一帧什么都不执行，但不属于错误。
         if (FrameFuncRef == LUA_NOREF)
             return true;
 
-        // 从 Registry 把之前保存的函数压到栈顶
+        // Registry[FrameFuncRef]
+        // → 压回 Lua stack
         lua_rawgeti(
             L,
             LUA_REGISTRYINDEX,
             FrameFuncRef
         );
 
+        if (!lua_isfunction(L, -1))
+        {
+            lua_pop(L, 1);
 
-        int result = lua_pcall(
-            L,
-            0,  // 参数数量
-            0,  // 返回值数量
-            0   // error handler
-        );
+            error =
+                "Stored FrameFunc reference is not a function";
+
+            return false;
+        }
+
+        int result =
+            lua_pcall(
+                L,
+                0,
+                0,
+                0
+            );
 
         if (result != 0)
         {
-            const char* error =
-                lua_tostring(L, -1);
-
-            core::modules::Debug::ErrorBox(
-                "Lua Error",
-                error ? error : "Unknown Lua error"
-            );
-
-            lua_pop(L, 1);
+            ReadAndPopError(error);
 
             return false;
         }
@@ -111,9 +181,17 @@ namespace core::runtime::Lua {
         return true;
     }
 
-    void Shutdown() {
+
+    void Shutdown()
+    {
         if (!L)
+        {
+            FrameFuncRef =
+                LUA_NOREF;
+
             return;
+        }
+
         if (FrameFuncRef != LUA_NOREF)
         {
             luaL_unref(
@@ -122,9 +200,16 @@ namespace core::runtime::Lua {
                 FrameFuncRef
             );
 
-            FrameFuncRef = LUA_NOREF;
+            FrameFuncRef =
+                LUA_NOREF;
         }
+
         lua_close(L);
+
         L = nullptr;
+
+        core::runtime::Log::Debug(
+            "Lua runtime shutdown"
+        );
     }
 }

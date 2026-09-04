@@ -8,7 +8,11 @@ function Angle(obj1,obj2)
     return modules.Math.atan2(dy,dx)
 end
 print(string.format("The angle from boss to player is %.1f",Angle(boss,player)))
+modules.Debug.Log("hello")
+modules.Debug.Warn("careful")
+modules.Debug.Error("fatal test")
 
+print("这里不会执行")
 
 modules.Frame.SetFrameFunc(
     function()
