@@ -9,5 +9,6 @@ namespace core::runtime::Frame {
 	void Shutdown();
 	void SetTargetFPS(int fps);
 	double GetCurrentFPS();
+	int GetTargetFPS();
 	std::uint64_t GetFrameCount();
 }

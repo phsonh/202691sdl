@@ -61,4 +61,7 @@ namespace core::runtime::Frame {
 	double GetCurrentFPS() {
 		return CurrentFPS;
 	}
+	int GetTargetFPS() {
+		return TargetFPS;
+	}
 }

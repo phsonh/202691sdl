@@ -128,6 +128,8 @@ add_custom_target(
         copy_directory
         "${CMAKE_SOURCE_DIR}/scripts"
         "${CMAKE_CURRENT_BINARY_DIR}/scripts"
+        "${CMAKE_SOURCE_DIR}/doc"
+        "${CMAKE_CURRENT_BINARY_DIR}/doc"
 
     COMMENT
         "Copying Lua scripts"
