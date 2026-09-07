@@ -29,6 +29,10 @@ namespace core::modules::Window {
 
         return true;
     }
+    SDL_Window* GetNativeHandle()
+    {
+        return window;
+    }
     bool SetTitle(const char* title) {
         if (!window) {
             return false;
