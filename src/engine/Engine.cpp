@@ -12,6 +12,8 @@
 #include "lua_bind/modules/Frame/Frame.h"
 #include "lua_bind/modules/Math/Math.h"
 #include "lua_bind/modules/Debug/Debug.h"
+#include "core/modules/Graphic/Graphic.h"
+
 
 namespace engine {
     namespace {
@@ -34,6 +36,8 @@ namespace engine {
                 // 2
                 core::modules::Window::Init(1280, 960) &&
                 // 3
+                core::modules::Graphic::Init() &&
+                // 4
                 core::modules::Math::Init();
         }
         void ReportLuaError(
@@ -94,8 +98,10 @@ namespace engine {
         }
         
         void Modules_Shutdown() {
-            // 3
+            // 4
             core::modules::Math::Shutdown();
+            // 3
+            core::modules::Graphic::Shutdown();
             // 2
             core::modules::Window::Shutdown();
             // 1
@@ -158,6 +164,7 @@ namespace engine {
                 )
             {
                 IsRunning = false;
+                break;
             }
 
 
