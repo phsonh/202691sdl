@@ -129,6 +129,11 @@ add_custom_target(
 
     COMMAND
         ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/shaders"
+        "${CMAKE_CURRENT_BINARY_DIR}/shaders"
+
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/doc"
         "${CMAKE_CURRENT_BINARY_DIR}/doc"
 

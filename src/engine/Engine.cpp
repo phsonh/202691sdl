@@ -181,7 +181,11 @@ namespace engine {
 
                 return false;
             }
-
+            if (!core::modules::Graphic::RenderFrame())
+            {
+                IsRunning = false;
+                return false;
+            }
 
             core::runtime::Frame::End();
         }
